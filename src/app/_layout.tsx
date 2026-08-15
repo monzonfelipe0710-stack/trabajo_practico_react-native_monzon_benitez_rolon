@@ -6,6 +6,12 @@ export default function LayoutRaiz() {
     <>
       <Stack>
         <Stack.Screen name="index" options={{ title: "Películas" }} />
+        <Stack.Screen
+          name="detalle/[id]"
+          options={{ title: "Detalle de película" }}
+        />
+        <Stack.Screen name="agregar" options={{ title: "Agregar película" }} />
+        <Stack.Screen name="acerca" options={{ title: "Acerca de" }} />
       </Stack>
       <StatusBar style="auto" />
     </>
