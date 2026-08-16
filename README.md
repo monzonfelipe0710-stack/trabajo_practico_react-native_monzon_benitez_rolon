@@ -1,50 +1,63 @@
-# Welcome to your Expo app 👋
+# Catálogo de Películas
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Trabajo práctico de React Native: aplicación de catálogo de películas con
+listado, detalle, formulario de alta y pantalla "Acerca de". Los datos son
+mock locales, sin backend.
 
-## Get started
+## Tecnologías
 
-1. Install dependencies
+- React Native + Expo (SDK 54)
+- Expo Router (navegación)
+- TypeScript
+- Datos mock con latencia simulada (500 a 1000 ms)
+
+## Cómo ejecutar
+
+1. Instalar dependencias:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. Iniciar el proyecto:
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. Escanear el QR con la app **Expo Go** en un celular, o abrir en emulador.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Estructura
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+src/
+├── app/            pantallas (Expo Router)
+│   ├── _layout.tsx     navegación (Stack)
+│   ├── index.tsx       listado de películas
+│   ├── agregar.tsx     formulario (pendiente)
+│   ├── acerca.tsx      acerca de (pendiente)
+│   └── detalle/
+│       └── [id].tsx    detalle (pendiente)
+└── services/
+    └── peliculas.ts    mock de películas
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Estado del proyecto
 
-## Learn more
+| Tarea | Estado |
+|---|---|
+| Configuración inicial | hecha |
+| Mock de películas | hecha |
+| Listado de películas | hecha |
+| Menú / navegación | hecha |
+| Detalle de película | pendiente |
+| Formulario de película | pendiente |
+| Pantalla Acerca de | pendiente |
+| Pruebas y correcciones | pendiente |
 
-To learn more about developing your project with Expo, look at the following resources:
+Más detalle en [spec.md](spec.md), [plan.md](plan.md), [tasks.md](tasks.md)
+y [PROCESO.md](PROCESO.md).
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Equipo
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Monzón - Benítez - Rolón
