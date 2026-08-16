@@ -10,6 +10,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    useWindowDimensions,
 } from "react-native";
 
 import { obtenerPeliculas, type Pelicula } from "@/services/peliculas";
@@ -19,7 +20,8 @@ import { tema, useTema } from "./tema";
 export default function PantallaListado() {
   const router = useRouter();
   const { colores } = useTema();
-  const estilos = crearEstilos(colores);
+  const { width } = useWindowDimensions();
+  const estilos = crearEstilos(colores, width);
   const [peliculas, setPeliculas] = useState<Pelicula[]>([]);
   const [cargando, setCargando] = useState(true);
   const [query, setQuery] = useState("");
@@ -168,7 +170,11 @@ export default function PantallaListado() {
   );
 }
 
-function crearEstilos(colores: typeof tema.colores) {
+function crearEstilos(colores: typeof tema.colores, ancho: number) {
+  const esEscritorio = ancho >= 900;
+  const anchoContenido = Math.min(ancho, 1280);
+  const anchoTarjeta = esEscritorio ? 220 : ancho < 420 ? 156 : 172;
+
   return StyleSheet.create({
     contenedor: {
       flex: 1,
@@ -199,7 +205,10 @@ function crearEstilos(colores: typeof tema.colores) {
       color: colores.textoSuave,
     },
     hero: {
-      height: 340,
+      height: esEscritorio ? 500 : ancho < 420 ? 300 : 340,
+      width: "100%",
+      maxWidth: anchoContenido,
+      alignSelf: "center",
       justifyContent: "flex-end",
       backgroundColor: colores.fondoOscuro,
     },
@@ -208,7 +217,10 @@ function crearEstilos(colores: typeof tema.colores) {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(10,10,10,0.48)",
     },
-    heroContent: { padding: 24, maxWidth: 360 },
+    heroContent: {
+      padding: esEscritorio ? 48 : 24,
+      maxWidth: esEscritorio ? 560 : 360,
+    },
     kicker: {
       color: colores.acentoSuave,
       fontSize: 11,
@@ -218,8 +230,8 @@ function crearEstilos(colores: typeof tema.colores) {
     },
     heroTitle: {
       color: colores.textoSobreOscuro,
-      fontSize: 38,
-      lineHeight: 42,
+      fontSize: esEscritorio ? 58 : ancho < 420 ? 32 : 38,
+      lineHeight: esEscritorio ? 64 : ancho < 420 ? 36 : 42,
       fontWeight: "800",
     },
     heroMeta: {
@@ -243,12 +255,17 @@ function crearEstilos(colores: typeof tema.colores) {
       fontWeight: "800",
       letterSpacing: 0.8,
     },
-    content: { paddingTop: 30 },
+    content: {
+      paddingTop: 30,
+      width: "100%",
+      maxWidth: anchoContenido,
+      alignSelf: "center",
+    },
     sectionHeading: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "flex-end",
-      paddingHorizontal: 20,
+      paddingHorizontal: esEscritorio ? 40 : 20,
     },
     eyebrow: {
       color: colores.acento,
@@ -257,7 +274,11 @@ function crearEstilos(colores: typeof tema.colores) {
       letterSpacing: 1.4,
       marginBottom: 6,
     },
-    sectionTitle: { color: colores.texto, fontSize: 26, fontWeight: "800" },
+    sectionTitle: {
+      color: colores.texto,
+      fontSize: esEscritorio ? 34 : 26,
+      fontWeight: "800",
+    },
     addLink: {
       color: colores.texto,
       fontSize: 10,
@@ -266,7 +287,7 @@ function crearEstilos(colores: typeof tema.colores) {
       paddingBottom: 3,
     },
     filters: {
-      paddingHorizontal: 20,
+      paddingHorizontal: esEscritorio ? 40 : 20,
       gap: 8,
       paddingTop: 20,
       paddingBottom: 2,
@@ -284,8 +305,12 @@ function crearEstilos(colores: typeof tema.colores) {
       fontWeight: "700",
     },
     filterTextActivo: { color: colores.textoSobreOscuro },
-    carousel: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 28 },
-    cardTouchable: { marginRight: 12, width: 172 },
+    carousel: {
+      paddingHorizontal: esEscritorio ? 40 : 20,
+      paddingTop: 20,
+      paddingBottom: 28,
+    },
+    cardTouchable: { marginRight: 12, width: anchoTarjeta },
     tarjeta: {
       backgroundColor: colores.fondoInput,
       borderRadius: tema.radios.tarjeta,
@@ -301,7 +326,7 @@ function crearEstilos(colores: typeof tema.colores) {
     },
     poster: {
       width: "100%",
-      height: 240,
+      height: anchoTarjeta * 1.4,
       borderRadius: tema.radios.imagen,
       marginBottom: tema.espaciados.chico,
     },
@@ -328,7 +353,7 @@ function crearEstilos(colores: typeof tema.colores) {
     footerLinks: {
       borderTopWidth: 1,
       borderTopColor: colores.borde,
-      padding: 20,
+      padding: esEscritorio ? 40 : 20,
       paddingBottom: 36,
     },
     aboutLink: {

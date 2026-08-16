@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Header from "./components/Header";
 import { tema, useTema } from "./tema";
 
@@ -8,7 +8,7 @@ export default function Acerca() {
   return (
     <View style={styles.container}>
       <Header />
-      <View style={styles.content}>
+      <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.titulo}>Acerca de</Text>
         <Text style={styles.destacado}>
           TopFilms — Catálogo de Películas (Trabajo práctico React Native)
@@ -22,7 +22,7 @@ export default function Acerca() {
           expo-router, uso de datos mock y manejo de estados de carga y vacío.
           Los datos no provienen de un backend real.
         </Text>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -30,7 +30,7 @@ export default function Acerca() {
 function crearEstilos(colores: typeof tema.colores) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colores.fondo },
-    content: { padding: tema.espaciados.mediano },
+    content: { padding: tema.espaciados.mediano, width: "100%", maxWidth: 760, alignSelf: "center", paddingBottom: 40 },
     titulo: {
       fontSize: 26,
       fontWeight: "800",

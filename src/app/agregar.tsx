@@ -5,6 +5,7 @@ import {
     ActivityIndicator,
     Alert,
     Image,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -114,7 +115,10 @@ export default function AgregarPelicula() {
   return (
     <View style={styles.container}>
       <Header />
-      <View style={styles.formulario}>
+      <ScrollView
+        contentContainerStyle={styles.formulario}
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.label}>Título</Text>
         <TextInput
           style={styles.input}
@@ -201,7 +205,7 @@ export default function AgregarPelicula() {
             <Text style={styles.buttonPrimaryText}>Agregar película</Text>
           </TouchableOpacity>
         )}
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -209,7 +213,13 @@ export default function AgregarPelicula() {
 function crearEstilos(colores: typeof tema.colores) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colores.fondo },
-    formulario: { padding: tema.espaciados.mediano },
+    formulario: {
+      padding: tema.espaciados.mediano,
+      width: "100%",
+      maxWidth: 760,
+      alignSelf: "center",
+      paddingBottom: 40,
+    },
     label: {
       fontWeight: "700",
       fontSize: 12,

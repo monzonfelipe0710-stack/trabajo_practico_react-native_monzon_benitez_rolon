@@ -9,6 +9,7 @@ import {
     Text,
     TouchableOpacity,
     View,
+    useWindowDimensions,
 } from "react-native";
 
 import {
@@ -26,7 +27,8 @@ export default function DetallePelicula() {
   const [pelicula, setPelicula] = useState<Pelicula | null>(null);
   const [cargando, setCargando] = useState(true);
   const { colores } = useTema();
-  const styles = crearEstilos(colores);
+  const { width } = useWindowDimensions();
+  const styles = crearEstilos(colores, width);
 
   useEffect(() => {
     async function cargar() {
@@ -116,10 +118,18 @@ export default function DetallePelicula() {
   );
 }
 
-function crearEstilos(colores: typeof tema.colores) {
+function crearEstilos(colores: typeof tema.colores, ancho: number) {
+  const esMovil = ancho < 700;
+  const anchoPoster = esMovil ? Math.min(ancho - 48, 280) : 300;
+
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colores.fondo },
-    content: { padding: tema.espaciados.mediano },
+    content: {
+      padding: esMovil ? 16 : 32,
+      width: "100%",
+      maxWidth: 1200,
+      alignSelf: "center",
+    },
     centro: {
       flex: 1,
       alignItems: "center",
@@ -130,14 +140,17 @@ function crearEstilos(colores: typeof tema.colores) {
     },
     textoCentro: { color: colores.textoSuave },
     cardRow: {
-      flexDirection: "row",
+      flexDirection: esMovil ? "column" : "row",
       alignItems: "flex-start",
       paddingVertical: tema.espaciados.mediano,
       paddingHorizontal: tema.espaciados.chico,
       gap: tema.espaciados.mediano,
     },
     details: { flex: 1 },
-    imageContainer: { width: 300 },
+    imageContainer: {
+      width: esMovil ? "100%" : anchoPoster,
+      alignItems: esMovil ? "center" : "stretch",
+    },
     sub: {
       color: colores.acento,
       fontSize: 12,
@@ -152,8 +165,8 @@ function crearEstilos(colores: typeof tema.colores) {
       marginBottom: tema.espaciados.mediano,
     },
     posterSide: {
-      width: "100%",
-      height: 420,
+      width: anchoPoster,
+      height: anchoPoster * 1.4,
       borderRadius: tema.radios.tarjeta,
       borderWidth: 1,
       borderColor: colores.borde,
