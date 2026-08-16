@@ -48,12 +48,14 @@ export default function PantallaListado() {
           data={peliculas}
           keyExtractor={(pelicula) => pelicula.id}
           renderItem={({ item }) => (
-            <View style={estilos.tarjeta}>
-              <Text style={estilos.titulo}>{item.titulo}</Text>
-              <Text style={estilos.datos}>
-                {item.genero} - {item.anio}
-              </Text>
-            </View>
+            <Link href={`/detalle/${item.id}`} asChild>
+              <View style={estilos.tarjeta}>
+                <Text style={estilos.titulo}>{item.titulo}</Text>
+                <Text style={estilos.datos}>
+                  {item.genero} - {item.anio}
+                </Text>
+              </View>
+            </Link>
           )}
         />
       )}
