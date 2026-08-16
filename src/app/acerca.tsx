@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import Header from "./components/Header";
+import { tema } from "./tema";
 
 export default function Acerca() {
   return (
@@ -7,11 +8,13 @@ export default function Acerca() {
       <Header />
       <View style={styles.content}>
         <Text style={styles.titulo}>Acerca de</Text>
-        <Text style={{ color: '#fff' }}>Proyecto: TopFilms — Catálogo de Películas (Trabajo práctico React Native)</Text>
+        <Text style={styles.destacado}>
+          TopFilms — Catálogo de Películas (Trabajo práctico React Native)
+        </Text>
         <Text style={styles.parrafo}>Integrantes:</Text>
-        <Text style={{ color: '#fff' }}>- Rolón Agustín</Text>
-        <Text style={{ color: '#fff' }}>- Benitez Gonzalo</Text>
-        <Text style={{ color: '#fff' }}>- Monzón Felipe</Text>
+        <Text style={styles.item}>- Rolón Agustín</Text>
+        <Text style={styles.item}>- Benitez Gonzalo</Text>
+        <Text style={styles.item}>- Monzón Felipe</Text>
         <Text style={styles.parrafo}>
           Esta aplicación es un prototipo que demuestra navegación con expo-router,
           uso de datos mock y manejo de estados de carga y vacío. Los datos no
@@ -23,8 +26,25 @@ export default function Acerca() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0b0b0b' },
-  content: { padding: 16 },
-  titulo: { fontSize: 20, fontWeight: "bold", color: '#fff' },
-  parrafo: { marginTop: 8, lineHeight: 20, color: '#ddd' },
+  container: { flex: 1, backgroundColor: tema.colores.fondo },
+  content: { padding: tema.espaciados.mediano },
+  titulo: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: tema.colores.texto,
+    marginBottom: tema.espaciados.mediano,
+  },
+  destacado: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: tema.colores.texto,
+    marginBottom: tema.espaciados.mediano,
+  },
+  parrafo: {
+    marginTop: tema.espaciados.chico,
+    lineHeight: 22,
+    color: "#444444",
+    fontSize: 14,
+  },
+  item: { color: tema.colores.textoSuave, lineHeight: 24 },
 });

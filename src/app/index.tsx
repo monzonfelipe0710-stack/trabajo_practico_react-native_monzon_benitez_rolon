@@ -8,14 +8,15 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Platform,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 import { obtenerPeliculas, type Pelicula } from "@/services/peliculas";
 import Header from "./components/Header";
+import { tema } from "./tema";
 
 export default function PantallaListado() {
+  const router = useRouter();
   const [peliculas, setPeliculas] = useState<Pelicula[]>([]);
   const [cargando, setCargando] = useState(true);
   const [query, setQuery] = useState("");
@@ -39,7 +40,7 @@ export default function PantallaListado() {
       <View style={estilos.searchRow}>
         <TextInput
           placeholder="Buscar películas..."
-          placeholderTextColor="#bbb"
+          placeholderTextColor={tema.colores.textoSuave}
           value={query}
           onChangeText={setQuery}
           style={estilos.search}
@@ -50,18 +51,18 @@ export default function PantallaListado() {
         <Link href="/agregar" style={estilos.botonMenu}>
           Agregar película
         </Link>
-        <Link href="/acerca" style={estilos.botonMenu}>
+        <Link href="/acerca" style={[estilos.botonMenu, estilos.botonSecundario]}>
           Acerca de
         </Link>
       </View>
       {cargando ? (
         <View style={estilos.centro}>
-          <ActivityIndicator size="large" />
-          <Text style={{ color: '#fff' }}>Cargando películas...</Text>
+          <ActivityIndicator size="large" color={tema.colores.texto} />
+          <Text style={estilos.textoCentro}>Cargando películas...</Text>
         </View>
       ) : filtered.length === 0 ? (
         <View style={estilos.centro}>
-          <Text style={{ color: '#fff' }}>No hay películas cargadas.</Text>
+          <Text style={estilos.textoCentro}>No hay películas cargadas.</Text>
         </View>
       ) : (
         <View style={estilos.carouselContainer}>
@@ -74,11 +75,7 @@ export default function PantallaListado() {
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={estilos.cardTouchable}
-                onPress={() => {
-                  if (Platform.OS === "web") {
-                    window.location.href = `/detalle/${item.id}`;
-                  }
-                }}
+                onPress={() => router.push(`/detalle/${item.id}`)}
               >
                 <View style={estilos.tarjeta}>
                   {item.poster ? (
@@ -103,103 +100,86 @@ export default function PantallaListado() {
 const estilos = StyleSheet.create({
   contenedor: {
     flex: 1,
-    backgroundColor: "#0b0b0b",
+    backgroundColor: tema.colores.fondo,
   },
-  header: {
-    paddingTop: 12,
-    paddingBottom: 8,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#222",
-    backgroundColor: "#0b0b0b",
-  },
-  headerTitle: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  topBar: {
-    height: 72,
-    backgroundColor: "#0b0b0b",
-    borderBottomWidth: 1,
-    borderBottomColor: "#111",
-    paddingHorizontal: 16,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 12,
-  },
-  logo: { color: "#e50914", fontWeight: "800", fontSize: 18, marginRight: 12 },
   searchRow: {
     flexDirection: "row",
-    paddingHorizontal: 12,
-    paddingBottom: 10,
+    paddingHorizontal: tema.espaciados.mediano,
+    paddingTop: tema.espaciados.mediano,
   },
   search: {
     flex: 1,
-    backgroundColor: "#111",
-    color: "#fff",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
+    backgroundColor: tema.colores.fondoInput,
+    color: tema.colores.texto,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: tema.radios.boton,
+    fontSize: 14,
   },
-  menuRow: { flexDirection: "row", justifyContent: "center", paddingVertical: 12 },
-  carouselContainer: { paddingVertical: 12 },
-  carousel: { paddingHorizontal: 16 },
-  cardTouchable: { marginRight: 16 },
-  menu: {
+  menuRow: {
     flexDirection: "row",
     justifyContent: "center",
-    padding: 12,
+    paddingVertical: tema.espaciados.mediano,
+    gap: 10,
   },
   botonMenu: {
-    backgroundColor: "#2f6fed",
-    color: "white",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
-    fontWeight: "bold",
-    marginHorizontal: 6,
+    backgroundColor: tema.colores.botonPrimario,
+    color: tema.colores.textoBotonPrimario,
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    borderRadius: tema.radios.boton,
+    fontWeight: "700",
+    fontSize: 13,
+    overflow: "hidden",
+  },
+  botonSecundario: {
+    backgroundColor: tema.colores.botonSecundario,
+    color: tema.colores.texto,
   },
   centro: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
+    gap: 10,
   },
-  row: {
-    justifyContent: "space-between",
-    paddingHorizontal: 12,
+  textoCentro: {
+    color: tema.colores.textoSuave,
   },
+  carouselContainer: { paddingVertical: tema.espaciados.chico },
+  carousel: { paddingHorizontal: tema.espaciados.mediano },
+  cardTouchable: { marginRight: tema.espaciados.mediano },
   tarjeta: {
-    backgroundColor: "#141414",
-    borderRadius: 8,
-    padding: 8,
-    marginBottom: 16,
-    width: 220,
+    backgroundColor: tema.colores.fondo,
+    borderRadius: tema.radios.tarjeta,
+    borderWidth: 1,
+    borderColor: tema.colores.borde,
+    padding: 10,
+    width: 200,
     overflow: "hidden",
-    // sombra / elevación
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
     shadowRadius: 6,
-    elevation: 6,
+    elevation: 2,
   },
   poster: {
     width: "100%",
-    height: 300,
-    borderRadius: 6,
-    marginBottom: 8,
+    height: 280,
+    borderRadius: tema.radios.imagen,
+    marginBottom: tema.espaciados.chico,
   },
   posterPlaceholder: {
-    backgroundColor: "#333",
+    backgroundColor: tema.colores.fondoInput,
   },
   titulo: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "700",
-    color: "#fff",
+    color: tema.colores.texto,
   },
   datos: {
-    color: "#bbb",
+    color: tema.colores.textoSuave,
     fontSize: 12,
+    marginTop: 2,
   },
 });

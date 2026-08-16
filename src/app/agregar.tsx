@@ -6,6 +6,7 @@ import { completarDatosDesdeTMDB } from "@/services/peliculas";
 
 import { agregarPelicula } from "@/services/peliculas";
 import { getTmdbApiKey, TMDB_IMAGE_BASE } from "@/config/tmdb";
+import { tema } from "./tema";
 
 export default function AgregarPelicula() {
   const router = useRouter();
@@ -83,62 +84,103 @@ export default function AgregarPelicula() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Título</Text>
-      <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} />
+      <Header />
+      <View style={styles.formulario}>
+        <Text style={styles.label}>Título</Text>
+        <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Ej: Nueve Reinas" placeholderTextColor={tema.colores.textoSuave} />
 
-      <Text style={styles.label}>Género</Text>
-      <TextInput style={styles.input} value={genero} onChangeText={setGenero} />
+        <Text style={styles.label}>Género</Text>
+        <TextInput style={styles.input} value={genero} onChangeText={setGenero} placeholder="Ej: Thriller" placeholderTextColor={tema.colores.textoSuave} />
 
-      <Text style={styles.label}>Año</Text>
-      <TextInput style={styles.input} value={anio} onChangeText={setAnio} keyboardType="numeric" />
+        <Text style={styles.label}>Año</Text>
+        <TextInput style={styles.input} value={anio} onChangeText={setAnio} keyboardType="numeric" placeholder="Ej: 2000" placeholderTextColor={tema.colores.textoSuave} />
 
-      <Text style={styles.label}>Descripción</Text>
-      <TextInput style={[styles.input, styles.multiline]} value={descripcion} onChangeText={setDescripcion} multiline numberOfLines={4} />
+        <Text style={styles.label}>Descripción</Text>
+        <TextInput style={[styles.input, styles.multiline]} value={descripcion} onChangeText={setDescripcion} multiline numberOfLines={4} placeholder="De qué trata la película" placeholderTextColor={tema.colores.textoSuave} />
 
-      <View style={styles.posterRow}>
-        {poster ? <Image source={{ uri: poster }} style={styles.posterPreview} /> : <View style={[styles.posterPreview, styles.posterPlaceholder]} />}
-        <View style={styles.posterButtons}>
-          <TouchableOpacity style={styles.secondaryButton} onPress={async () => {
-            // Buscar y rellenar datos (poster, descripción, género, año)
-            const temp = { titulo: titulo.trim(), genero: genero.trim() || undefined, anio: anio ? Number(anio) : undefined, descripcion: descripcion.trim() || undefined, poster: poster || null } as any;
-            try {
-              setSubmitting(true);
-              await completarDatosDesdeTMDB(temp);
-              // actualizar estados si la función rellenó datos
-              if (temp.poster) setPoster(temp.poster);
-              if (temp.descripcion) setDescripcion(temp.descripcion);
-              if (temp.genero) setGenero(temp.genero);
-              if (temp.anio) setAnio(String(temp.anio));
-            } catch (e) {
-              // error manejado en servicio
-            } finally {
-              setSubmitting(false);
-            }
-          }}>
-            <Text style={styles.buttonText}>Buscar datos de la película automáticamente</Text>
-          </TouchableOpacity>
+        <View style={styles.posterRow}>
+          {poster ? <Image source={{ uri: poster }} style={styles.posterPreview} /> : <View style={[styles.posterPreview, styles.posterPlaceholder]} />}
+          <View style={styles.posterButtons}>
+            <TouchableOpacity style={styles.secondaryButton} onPress={async () => {
+              // Buscar y rellenar datos (poster, descripción, género, año)
+              const temp = { titulo: titulo.trim(), genero: genero.trim() || undefined, anio: anio ? Number(anio) : undefined, descripcion: descripcion.trim() || undefined, poster: poster || null } as any;
+              try {
+                setSubmitting(true);
+                await completarDatosDesdeTMDB(temp);
+                // actualizar estados si la función rellenó datos
+                if (temp.poster) setPoster(temp.poster);
+                if (temp.descripcion) setDescripcion(temp.descripcion);
+                if (temp.genero) setGenero(temp.genero);
+                if (temp.anio) setAnio(String(temp.anio));
+              } catch (e) {
+                // error manejado en servicio
+              } finally {
+                setSubmitting(false);
+              }
+            }}>
+              <Text style={styles.buttonSecondaryText}>Completar datos automáticamente</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      {submitting ? <ActivityIndicator /> : (
-        <TouchableOpacity style={styles.primaryButton} onPress={onSubmit}>
-          <Text style={styles.buttonText}>Agregar</Text>
-        </TouchableOpacity>
-      )}
+        {submitting ? <ActivityIndicator color={tema.colores.texto} /> : (
+          <TouchableOpacity style={styles.primaryButton} onPress={onSubmit}>
+            <Text style={styles.buttonPrimaryText}>Agregar película</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#0b0b0b' },
-  label: { fontWeight: "600", marginBottom: 4, color: '#fff' },
-  input: { borderWidth: 1, borderColor: "#333", padding: 8, borderRadius: 6, marginBottom: 8, backgroundColor: '#111', color: '#fff' },
-  multiline: { minHeight: 80, textAlignVertical: "top" },
-  posterRow: { flexDirection: "row", alignItems: "center", marginVertical: 8 },
-  posterPreview: { width: 100, height: 150, borderRadius: 6, backgroundColor: "#333" },
+  container: { flex: 1, backgroundColor: tema.colores.fondo },
+  formulario: { padding: tema.espaciados.mediano },
+  label: {
+    fontWeight: "700",
+    fontSize: 12,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 6,
+    marginTop: tema.espaciados.mediano,
+    color: tema.colores.texto,
+  },
+  input: {
+    backgroundColor: tema.colores.fondoInput,
+    borderWidth: 1,
+    borderColor: tema.colores.borde,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: tema.radios.boton,
+    color: tema.colores.texto,
+    fontSize: 14,
+  },
+  multiline: { minHeight: 90, textAlignVertical: "top" },
+  posterRow: { flexDirection: "row", alignItems: "center", marginVertical: tema.espaciados.mediano, gap: tema.espaciados.mediano },
+  posterPreview: {
+    width: 100,
+    height: 150,
+    borderRadius: tema.radios.imagen,
+    backgroundColor: tema.colores.fondoInput,
+    borderWidth: 1,
+    borderColor: tema.colores.borde,
+  },
   posterPlaceholder: { justifyContent: "center", alignItems: "center" },
-  posterButtons: { flex: 1, marginLeft: 8 },
-  primaryButton: { backgroundColor: '#e50914', paddingVertical: 12, borderRadius: 6, alignItems: 'center', marginTop: 12 },
-  secondaryButton: { backgroundColor: '#444', paddingVertical: 12, borderRadius: 6, alignItems: 'center' },
-  buttonText: { color: '#fff', fontWeight: '700' },
+  posterButtons: { flex: 1 },
+  primaryButton: {
+    backgroundColor: tema.colores.botonPrimario,
+    paddingVertical: 14,
+    borderRadius: tema.radios.boton,
+    alignItems: "center",
+    marginTop: tema.espaciados.mediano,
+  },
+  buttonPrimaryText: { color: tema.colores.textoBotonPrimario, fontWeight: "700", fontSize: 14 },
+  secondaryButton: {
+    backgroundColor: tema.colores.botonSecundario,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: tema.radios.boton,
+    alignItems: "center",
+  },
+  buttonSecondaryText: { color: tema.colores.texto, fontWeight: "600", fontSize: 13 },
 });

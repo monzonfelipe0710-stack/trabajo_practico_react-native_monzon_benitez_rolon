@@ -4,6 +4,7 @@ import { useLocalSearchParams, Link } from "expo-router";
 
 import Header from "../components/Header";
 import { obtenerPelicula, completarDatosDesdeTMDB, type Pelicula } from "@/services/peliculas";
+import { tema } from "../tema";
 
 export default function DetallePelicula() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -30,16 +31,18 @@ export default function DetallePelicula() {
   if (cargando)
     return (
       <View style={styles.centro}>
-        <ActivityIndicator size="large" />
-        <Text style={{ color: '#fff' }}>Cargando película...</Text>
+        <ActivityIndicator size="large" color={tema.colores.texto} />
+        <Text style={styles.textoCentro}>Cargando película...</Text>
       </View>
     );
 
   if (!pelicula)
     return (
       <View style={styles.centro}>
-        <Text style={{ color: '#fff' }}>Película no encontrada.</Text>
-        <Link href="/">Volver al listado</Link>
+        <Text style={styles.textoCentro}>Película no encontrada.</Text>
+        <Link href="/" style={styles.botonVolver}>
+          Volver al listado
+        </Link>
       </View>
     );
 
@@ -55,10 +58,12 @@ export default function DetallePelicula() {
           </View>
 
           <View style={styles.details}>
+            <Text style={styles.sub}>{pelicula.genero.toUpperCase()} — {pelicula.anio}</Text>
             <Text style={styles.titulo}>{pelicula.titulo}</Text>
-            <Text style={styles.sub}>{pelicula.genero} — {pelicula.anio}</Text>
             <Text style={styles.descripcion}>{pelicula.descripcion}</Text>
-            <Link href="/">Volver al listado</Link>
+            <Link href="/" style={styles.botonVolver}>
+              Volver al listado
+            </Link>
           </View>
         </View>
       </ScrollView>
@@ -67,15 +72,51 @@ export default function DetallePelicula() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0b0b0b' },
-  content: { padding: 16 },
-  centro: { flex: 1, alignItems: "center", justifyContent: "center", padding: 8 },
-  row: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 12 },
-  cardRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 16, paddingHorizontal: 16 },
-  details: { flex: 1, marginLeft: 16 },
-  imageContainer: { width: 320 },
-  titulo: { fontSize: 22, fontWeight: "bold", color: '#fff', marginTop: 8 },
-  sub: { color: "#bbb", marginTop: 4 },
-  posterSide: { width: '100%', height: 420, borderRadius: 8 },
-  descripcion: { marginTop: 12, lineHeight: 20, color: '#ddd' },
+  container: { flex: 1, backgroundColor: tema.colores.fondo },
+  content: { padding: tema.espaciados.mediano },
+  centro: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 8,
+    gap: tema.espaciados.mediano,
+    backgroundColor: tema.colores.fondo,
+  },
+  textoCentro: { color: tema.colores.textoSuave },
+  cardRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingVertical: tema.espaciados.mediano,
+    paddingHorizontal: tema.espaciados.chico,
+    gap: tema.espaciados.mediano,
+  },
+  details: { flex: 1 },
+  imageContainer: { width: 300 },
+  sub: {
+    color: tema.colores.acento,
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 1,
+    marginBottom: 6,
+  },
+  titulo: { fontSize: 26, fontWeight: "800", color: tema.colores.texto, marginBottom: tema.espaciados.mediano },
+  posterSide: {
+    width: "100%",
+    height: 420,
+    borderRadius: tema.radios.tarjeta,
+    borderWidth: 1,
+    borderColor: tema.colores.borde,
+  },
+  descripcion: { lineHeight: 22, color: "#444444", fontSize: 15, marginBottom: tema.espaciados.grande },
+  botonVolver: {
+    backgroundColor: tema.colores.botonPrimario,
+    color: tema.colores.textoBotonPrimario,
+    paddingHorizontal: 20,
+    paddingVertical: 11,
+    borderRadius: tema.radios.boton,
+    fontWeight: "700",
+    fontSize: 13,
+    alignSelf: "flex-start",
+    overflow: "hidden",
+  },
 });
