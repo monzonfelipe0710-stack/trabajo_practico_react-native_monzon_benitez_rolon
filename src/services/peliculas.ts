@@ -1,5 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getTmdbApiKey, TMDB_IMAGE_BASE } from "@/config/tmdb";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type Pelicula = {
   id: string;
@@ -92,7 +92,10 @@ async function fetchPosterForMovie(p: Pelicula) {
   try {
     const key = getTmdbApiKey();
     if (!key) {
-      console.warn("TMDB API key not available; no poster search for", p.titulo);
+      console.warn(
+        "TMDB API key not available; no poster search for",
+        p.titulo,
+      );
       return;
     }
     const q = encodeURIComponent(p.titulo);
@@ -121,7 +124,10 @@ export async function completarDatosDesdeTMDB(p: Pelicula) {
   try {
     const key = getTmdbApiKey();
     if (!key) {
-      console.warn("TMDB API key not available; cannot completar datos para", p.titulo);
+      console.warn(
+        "TMDB API key not available; cannot completar datos para",
+        p.titulo,
+      );
       return;
     }
 
@@ -134,7 +140,12 @@ export async function completarDatosDesdeTMDB(p: Pelicula) {
       return;
     }
     const searchData = await searchRes.json();
-    if (!searchData || !Array.isArray(searchData.results) || searchData.results.length === 0) return;
+    if (
+      !searchData ||
+      !Array.isArray(searchData.results) ||
+      searchData.results.length === 0
+    )
+      return;
     const first = searchData.results[0];
 
     // 2) obtener detalles por id para conseguir géneros con nombre y overview completo
@@ -142,7 +153,11 @@ export async function completarDatosDesdeTMDB(p: Pelicula) {
     const detailsUrl = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${key}`;
     const detailsRes = await fetch(detailsUrl);
     if (!detailsRes.ok) {
-      console.warn("TMDB details fetch failed for id", movieId, detailsRes.status);
+      console.warn(
+        "TMDB details fetch failed for id",
+        movieId,
+        detailsRes.status,
+      );
       return;
     }
     const details = await detailsRes.json();
@@ -181,7 +196,9 @@ async function rellenarPostersIniciales() {
 
 // Lanzar en background sin bloquear
 cargarDesdeStorage().then(() => {
-  rellenarPostersIniciales().catch((e) => console.warn("Error rellenando posters:", e));
+  rellenarPostersIniciales().catch((e) =>
+    console.warn("Error rellenando posters:", e),
+  );
 });
 
 export async function obtenerPeliculas(): Promise<Pelicula[]> {
@@ -196,7 +213,7 @@ export async function obtenerPelicula(id: string): Promise<Pelicula | null> {
 }
 
 export async function agregarPelicula(
-  datos: Omit<Pelicula, "id">
+  datos: Omit<Pelicula, "id">,
 ): Promise<Pelicula> {
   await esperarLatencia();
   const nueva: Pelicula = {
@@ -207,4 +224,13 @@ export async function agregarPelicula(
   // guardar la lista actualizada en storage (no bloquear al caller)
   guardarEnStorage();
   return nueva;
+}
+
+export async function eliminarPelicula(id: string): Promise<boolean> {
+  await esperarLatencia();
+  const cantidadInicial = peliculas.length;
+  peliculas = peliculas.filter((pelicula) => pelicula.id !== id);
+  if (peliculas.length === cantidadInicial) return false;
+  await guardarEnStorage();
+  return true;
 }

@@ -1,25 +1,29 @@
+import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
+    ActivityIndicator,
+    Image,
+    ImageBackground,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { Link, useRouter } from "expo-router";
 
 import { obtenerPeliculas, type Pelicula } from "@/services/peliculas";
 import Header from "./components/Header";
-import { tema } from "./tema";
+import { tema, useTema } from "./tema";
 
 export default function PantallaListado() {
   const router = useRouter();
+  const { colores } = useTema();
+  const estilos = crearEstilos(colores);
   const [peliculas, setPeliculas] = useState<Pelicula[]>([]);
   const [cargando, setCargando] = useState(true);
   const [query, setQuery] = useState("");
+  const [generoActivo, setGeneroActivo] = useState("Todos");
 
   useEffect(() => {
     async function cargarPeliculas() {
@@ -30,34 +34,23 @@ export default function PantallaListado() {
     cargarPeliculas();
   }, []);
 
-  const filtered = peliculas.filter((p) =>
-    p.titulo.toLowerCase().includes(query.toLowerCase())
-  );
+  const generos = ["Todos", ...new Set(peliculas.map((p) => p.genero))];
+  const filtered = peliculas.filter((p) => {
+    const coincideBusqueda = p.titulo
+      .toLowerCase()
+      .includes(query.toLowerCase());
+    const coincideGenero =
+      generoActivo === "Todos" || p.genero === generoActivo;
+    return coincideBusqueda && coincideGenero;
+  });
+  const destacada = peliculas[0];
 
   return (
     <View style={estilos.contenedor}>
       <Header />
-      <View style={estilos.searchRow}>
-        <TextInput
-          placeholder="Buscar películas..."
-          placeholderTextColor={tema.colores.textoSuave}
-          value={query}
-          onChangeText={setQuery}
-          style={estilos.search}
-        />
-      </View>
-
-      <View style={estilos.menuRow}>
-        <Link href="/agregar" style={estilos.botonMenu}>
-          Agregar película
-        </Link>
-        <Link href="/acerca" style={[estilos.botonMenu, estilos.botonSecundario]}>
-          Acerca de
-        </Link>
-      </View>
       {cargando ? (
         <View style={estilos.centro}>
-          <ActivityIndicator size="large" color={tema.colores.texto} />
+          <ActivityIndicator size="large" color={colores.texto} />
           <Text style={estilos.textoCentro}>Cargando películas...</Text>
         </View>
       ) : filtered.length === 0 ? (
@@ -65,121 +58,284 @@ export default function PantallaListado() {
           <Text style={estilos.textoCentro}>No hay películas cargadas.</Text>
         </View>
       ) : (
-        <View style={estilos.carouselContainer}>
-          <FlatList
-            data={filtered}
-            keyExtractor={(pelicula) => pelicula.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={estilos.carousel}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={estilos.cardTouchable}
-                onPress={() => router.push(`/detalle/${item.id}`)}
-              >
-                <View style={estilos.tarjeta}>
-                  {item.poster ? (
-                    <Image source={{ uri: item.poster }} style={estilos.poster} />
-                  ) : (
-                    <View style={[estilos.poster, estilos.posterPlaceholder]} />
-                  )}
-                  <Text style={estilos.titulo}>{item.titulo}</Text>
-                  <Text style={estilos.datos}>
-                    {item.genero} - {item.anio}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {destacada && (
+            <ImageBackground
+              source={destacada.poster ? { uri: destacada.poster } : undefined}
+              style={estilos.hero}
+              imageStyle={estilos.heroImage}
+            >
+              <View style={estilos.heroShade} />
+              <View style={estilos.heroContent}>
+                <Text style={estilos.kicker}>SELECCION DE HOY</Text>
+                <Text style={estilos.heroTitle}>{destacada.titulo}</Text>
+                <Text style={estilos.heroMeta}>
+                  {destacada.genero.toUpperCase()} / {destacada.anio}
+                </Text>
+                <TouchableOpacity
+                  style={estilos.heroButton}
+                  onPress={() => router.push(`/detalle/${destacada.id}`)}
+                >
+                  <Text style={estilos.heroButtonText}>VER DETALLE →</Text>
+                </TouchableOpacity>
+              </View>
+            </ImageBackground>
+          )}
+          <View style={estilos.content}>
+            <View style={estilos.sectionHeading}>
+              <View>
+                <Text style={estilos.eyebrow}>EXPLORA EL CATALOGO</Text>
+                <Text style={estilos.sectionTitle}>Peliculas destacadas</Text>
+              </View>
+              <Link href="/agregar" style={estilos.addLink}>
+                + AGREGAR
+              </Link>
+            </View>
+            <View style={estilos.searchRow}>
+              <TextInput
+                placeholder="Buscar películas..."
+                placeholderTextColor={colores.textoSuave}
+                value={query}
+                onChangeText={setQuery}
+                style={estilos.search}
+              />
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={estilos.filters}
+            >
+              {generos.map((genero) => (
+                <TouchableOpacity
+                  key={genero}
+                  onPress={() => setGeneroActivo(genero)}
+                  style={[
+                    estilos.filter,
+                    generoActivo === genero && estilos.filterActivo,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      estilos.filterText,
+                      generoActivo === genero && estilos.filterTextActivo,
+                    ]}
+                  >
+                    {genero}
                   </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={estilos.carousel}
+            >
+              {filtered.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={estilos.cardTouchable}
+                  onPress={() => router.push(`/detalle/${item.id}`)}
+                >
+                  <View style={estilos.tarjeta}>
+                    {item.poster ? (
+                      <Image
+                        source={{ uri: item.poster }}
+                        style={estilos.poster}
+                      />
+                    ) : (
+                      <View
+                        style={[estilos.poster, estilos.posterPlaceholder]}
+                      />
+                    )}
+                    <Text style={estilos.cardGenre}>
+                      {item.genero.toUpperCase()}
+                    </Text>
+                    <Text style={estilos.titulo}>{item.titulo}</Text>
+                    <Text style={estilos.datos}>{item.anio}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <View style={estilos.footerLinks}>
+              <Link href="/acerca" style={estilos.aboutLink}>
+                SOBRE TOPFILMS →
+              </Link>
+            </View>
+          </View>
+        </ScrollView>
       )}
     </View>
   );
 }
 
-const estilos = StyleSheet.create({
-  contenedor: {
-    flex: 1,
-    backgroundColor: tema.colores.fondo,
-  },
-  searchRow: {
-    flexDirection: "row",
-    paddingHorizontal: tema.espaciados.mediano,
-    paddingTop: tema.espaciados.mediano,
-  },
-  search: {
-    flex: 1,
-    backgroundColor: tema.colores.fondoInput,
-    color: tema.colores.texto,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: tema.radios.boton,
-    fontSize: 14,
-  },
-  menuRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    paddingVertical: tema.espaciados.mediano,
-    gap: 10,
-  },
-  botonMenu: {
-    backgroundColor: tema.colores.botonPrimario,
-    color: tema.colores.textoBotonPrimario,
-    paddingHorizontal: 18,
-    paddingVertical: 9,
-    borderRadius: tema.radios.boton,
-    fontWeight: "700",
-    fontSize: 13,
-    overflow: "hidden",
-  },
-  botonSecundario: {
-    backgroundColor: tema.colores.botonSecundario,
-    color: tema.colores.texto,
-  },
-  centro: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 10,
-    gap: 10,
-  },
-  textoCentro: {
-    color: tema.colores.textoSuave,
-  },
-  carouselContainer: { paddingVertical: tema.espaciados.chico },
-  carousel: { paddingHorizontal: tema.espaciados.mediano },
-  cardTouchable: { marginRight: tema.espaciados.mediano },
-  tarjeta: {
-    backgroundColor: tema.colores.fondo,
-    borderRadius: tema.radios.tarjeta,
-    borderWidth: 1,
-    borderColor: tema.colores.borde,
-    padding: 10,
-    width: 200,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  poster: {
-    width: "100%",
-    height: 280,
-    borderRadius: tema.radios.imagen,
-    marginBottom: tema.espaciados.chico,
-  },
-  posterPlaceholder: {
-    backgroundColor: tema.colores.fondoInput,
-  },
-  titulo: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: tema.colores.texto,
-  },
-  datos: {
-    color: tema.colores.textoSuave,
-    fontSize: 12,
-    marginTop: 2,
-  },
-});
+function crearEstilos(colores: typeof tema.colores) {
+  return StyleSheet.create({
+    contenedor: {
+      flex: 1,
+      backgroundColor: colores.fondo,
+    },
+    searchRow: {
+      flexDirection: "row",
+      paddingHorizontal: 20,
+      paddingTop: 18,
+    },
+    search: {
+      flex: 1,
+      backgroundColor: colores.fondoInput,
+      color: colores.texto,
+      paddingVertical: 10,
+      paddingHorizontal: 18,
+      borderRadius: 4,
+      fontSize: 14,
+    },
+    centro: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 10,
+      gap: 10,
+    },
+    textoCentro: {
+      color: colores.textoSuave,
+    },
+    hero: {
+      height: 340,
+      justifyContent: "flex-end",
+      backgroundColor: colores.fondoOscuro,
+    },
+    heroImage: { opacity: 0.55 },
+    heroShade: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(10,10,10,0.48)",
+    },
+    heroContent: { padding: 24, maxWidth: 360 },
+    kicker: {
+      color: colores.acentoSuave,
+      fontSize: 11,
+      fontWeight: "800",
+      letterSpacing: 1.6,
+      marginBottom: 8,
+    },
+    heroTitle: {
+      color: colores.textoSobreOscuro,
+      fontSize: 38,
+      lineHeight: 42,
+      fontWeight: "800",
+    },
+    heroMeta: {
+      color: "#d2cbc4",
+      fontSize: 12,
+      fontWeight: "700",
+      letterSpacing: 1,
+      marginTop: 10,
+    },
+    heroButton: {
+      alignSelf: "flex-start",
+      backgroundColor: colores.acento,
+      paddingHorizontal: 16,
+      paddingVertical: 11,
+      borderRadius: 4,
+      marginTop: 18,
+    },
+    heroButtonText: {
+      color: "#fff",
+      fontSize: 11,
+      fontWeight: "800",
+      letterSpacing: 0.8,
+    },
+    content: { paddingTop: 30 },
+    sectionHeading: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-end",
+      paddingHorizontal: 20,
+    },
+    eyebrow: {
+      color: colores.acento,
+      fontSize: 10,
+      fontWeight: "800",
+      letterSpacing: 1.4,
+      marginBottom: 6,
+    },
+    sectionTitle: { color: colores.texto, fontSize: 26, fontWeight: "800" },
+    addLink: {
+      color: colores.texto,
+      fontSize: 10,
+      fontWeight: "800",
+      letterSpacing: 0.8,
+      paddingBottom: 3,
+    },
+    filters: {
+      paddingHorizontal: 20,
+      gap: 8,
+      paddingTop: 20,
+      paddingBottom: 2,
+    },
+    filter: {
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 999,
+      backgroundColor: colores.fondoInput,
+    },
+    filterActivo: { backgroundColor: colores.fondoOscuro },
+    filterText: {
+      color: colores.textoSuave,
+      fontSize: 11,
+      fontWeight: "700",
+    },
+    filterTextActivo: { color: colores.textoSobreOscuro },
+    carousel: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 28 },
+    cardTouchable: { marginRight: 12, width: 172 },
+    tarjeta: {
+      backgroundColor: colores.fondoInput,
+      borderRadius: tema.radios.tarjeta,
+      borderWidth: 1,
+      borderColor: colores.borde,
+      padding: 8,
+      overflow: "hidden",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 6,
+      elevation: 2,
+    },
+    poster: {
+      width: "100%",
+      height: 240,
+      borderRadius: tema.radios.imagen,
+      marginBottom: tema.espaciados.chico,
+    },
+    posterPlaceholder: {
+      backgroundColor: colores.fondoInput,
+    },
+    titulo: {
+      fontSize: 14,
+      fontWeight: "700",
+      color: colores.texto,
+    },
+    datos: {
+      color: colores.textoSuave,
+      fontSize: 12,
+      marginTop: 4,
+    },
+    cardGenre: {
+      color: colores.acento,
+      fontSize: 9,
+      fontWeight: "800",
+      letterSpacing: 0.8,
+      marginBottom: 4,
+    },
+    footerLinks: {
+      borderTopWidth: 1,
+      borderTopColor: colores.borde,
+      padding: 20,
+      paddingBottom: 36,
+    },
+    aboutLink: {
+      color: colores.texto,
+      fontSize: 11,
+      fontWeight: "800",
+      letterSpacing: 0.8,
+    },
+  });
+}

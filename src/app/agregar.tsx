@@ -1,15 +1,26 @@
-import { useState } from "react";
-import { ActivityIndicator, Alert, Image, StyleSheet, Text, TextInput, View, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
-import Header from "./components/Header";
 import { completarDatosDesdeTMDB } from "@/services/peliculas";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import {
+    ActivityIndicator,
+    Alert,
+    Image,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import Header from "./components/Header";
 
-import { agregarPelicula } from "@/services/peliculas";
 import { getTmdbApiKey, TMDB_IMAGE_BASE } from "@/config/tmdb";
-import { tema } from "./tema";
+import { agregarPelicula } from "@/services/peliculas";
+import { tema, useTema } from "./tema";
 
 export default function AgregarPelicula() {
   const router = useRouter();
+  const { colores } = useTema();
+  const styles = crearEstilos(colores);
   const [titulo, setTitulo] = useState("");
   const [genero, setGenero] = useState("");
   const [anio, setAnio] = useState("");
@@ -19,7 +30,10 @@ export default function AgregarPelicula() {
 
   function validar() {
     if (!titulo.trim() || !genero.trim() || !anio.trim()) {
-      Alert.alert("Campos obligatorios", "Título, género y año son obligatorios");
+      Alert.alert(
+        "Campos obligatorios",
+        "Título, género y año son obligatorios",
+      );
       return false;
     }
     const n = Number(anio);
@@ -34,7 +48,13 @@ export default function AgregarPelicula() {
     if (!validar()) return;
     setSubmitting(true);
     try {
-      await agregarPelicula({ titulo: titulo.trim(), genero: genero.trim(), anio: Number(anio), descripcion: descripcion.trim(), poster });
+      await agregarPelicula({
+        titulo: titulo.trim(),
+        genero: genero.trim(),
+        anio: Number(anio),
+        descripcion: descripcion.trim(),
+        poster,
+      });
       router.push("/");
     } catch (e) {
       Alert.alert("Error", "No se pudo agregar la película");
@@ -46,12 +66,18 @@ export default function AgregarPelicula() {
   async function buscarPosterTMDB() {
     const q = titulo.trim();
     if (!q) {
-      Alert.alert("Buscar póster", "Ingrese primero el título para buscar en TMDB.");
+      Alert.alert(
+        "Buscar póster",
+        "Ingrese primero el título para buscar en TMDB.",
+      );
       return;
     }
     const key = getTmdbApiKey();
     if (!key) {
-      Alert.alert("TMDB key", "No se encontró la clave de TMDB. Agregala en .env o en app config.");
+      Alert.alert(
+        "TMDB key",
+        "No se encontró la clave de TMDB. Agregala en .env o en app config.",
+      );
       return;
     }
     try {
@@ -73,7 +99,10 @@ export default function AgregarPelicula() {
           return;
         }
       }
-      Alert.alert("No encontrado", "No se encontró póster para ese título en TMDB.");
+      Alert.alert(
+        "No encontrado",
+        "No se encontró póster para ese título en TMDB.",
+      );
     } catch (err) {
       console.warn("Error buscando TMDB:", err);
       Alert.alert("Error", "No se pudo buscar en TMDB (ver consola).");
@@ -87,43 +116,87 @@ export default function AgregarPelicula() {
       <Header />
       <View style={styles.formulario}>
         <Text style={styles.label}>Título</Text>
-        <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Ej: Nueve Reinas" placeholderTextColor={tema.colores.textoSuave} />
+        <TextInput
+          style={styles.input}
+          value={titulo}
+          onChangeText={setTitulo}
+          placeholder="Ej: Nueve Reinas"
+          placeholderTextColor={colores.textoSuave}
+        />
 
         <Text style={styles.label}>Género</Text>
-        <TextInput style={styles.input} value={genero} onChangeText={setGenero} placeholder="Ej: Thriller" placeholderTextColor={tema.colores.textoSuave} />
+        <TextInput
+          style={styles.input}
+          value={genero}
+          onChangeText={setGenero}
+          placeholder="Ej: Thriller"
+          placeholderTextColor={colores.textoSuave}
+        />
 
         <Text style={styles.label}>Año</Text>
-        <TextInput style={styles.input} value={anio} onChangeText={setAnio} keyboardType="numeric" placeholder="Ej: 2000" placeholderTextColor={tema.colores.textoSuave} />
+        <TextInput
+          style={styles.input}
+          value={anio}
+          onChangeText={setAnio}
+          keyboardType="numeric"
+          placeholder="Ej: 2000"
+          placeholderTextColor={colores.textoSuave}
+        />
 
         <Text style={styles.label}>Descripción</Text>
-        <TextInput style={[styles.input, styles.multiline]} value={descripcion} onChangeText={setDescripcion} multiline numberOfLines={4} placeholder="De qué trata la película" placeholderTextColor={tema.colores.textoSuave} />
+        <TextInput
+          style={[styles.input, styles.multiline]}
+          value={descripcion}
+          onChangeText={setDescripcion}
+          multiline
+          numberOfLines={4}
+          placeholder="De qué trata la película"
+          placeholderTextColor={colores.textoSuave}
+        />
 
         <View style={styles.posterRow}>
-          {poster ? <Image source={{ uri: poster }} style={styles.posterPreview} /> : <View style={[styles.posterPreview, styles.posterPlaceholder]} />}
+          {poster ? (
+            <Image source={{ uri: poster }} style={styles.posterPreview} />
+          ) : (
+            <View style={[styles.posterPreview, styles.posterPlaceholder]} />
+          )}
           <View style={styles.posterButtons}>
-            <TouchableOpacity style={styles.secondaryButton} onPress={async () => {
-              // Buscar y rellenar datos (poster, descripción, género, año)
-              const temp = { titulo: titulo.trim(), genero: genero.trim() || undefined, anio: anio ? Number(anio) : undefined, descripcion: descripcion.trim() || undefined, poster: poster || null } as any;
-              try {
-                setSubmitting(true);
-                await completarDatosDesdeTMDB(temp);
-                // actualizar estados si la función rellenó datos
-                if (temp.poster) setPoster(temp.poster);
-                if (temp.descripcion) setDescripcion(temp.descripcion);
-                if (temp.genero) setGenero(temp.genero);
-                if (temp.anio) setAnio(String(temp.anio));
-              } catch (e) {
-                // error manejado en servicio
-              } finally {
-                setSubmitting(false);
-              }
-            }}>
-              <Text style={styles.buttonSecondaryText}>Completar datos automáticamente</Text>
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={async () => {
+                // Buscar y rellenar datos (poster, descripción, género, año)
+                const temp = {
+                  titulo: titulo.trim(),
+                  genero: genero.trim() || undefined,
+                  anio: anio ? Number(anio) : undefined,
+                  descripcion: descripcion.trim() || undefined,
+                  poster: poster || null,
+                } as any;
+                try {
+                  setSubmitting(true);
+                  await completarDatosDesdeTMDB(temp);
+                  // actualizar estados si la función rellenó datos
+                  if (temp.poster) setPoster(temp.poster);
+                  if (temp.descripcion) setDescripcion(temp.descripcion);
+                  if (temp.genero) setGenero(temp.genero);
+                  if (temp.anio) setAnio(String(temp.anio));
+                } catch (e) {
+                  // error manejado en servicio
+                } finally {
+                  setSubmitting(false);
+                }
+              }}
+            >
+              <Text style={styles.buttonSecondaryText}>
+                Completar datos automáticamente
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {submitting ? <ActivityIndicator color={tema.colores.texto} /> : (
+        {submitting ? (
+          <ActivityIndicator color={colores.texto} />
+        ) : (
           <TouchableOpacity style={styles.primaryButton} onPress={onSubmit}>
             <Text style={styles.buttonPrimaryText}>Agregar película</Text>
           </TouchableOpacity>
@@ -133,54 +206,69 @@ export default function AgregarPelicula() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: tema.colores.fondo },
-  formulario: { padding: tema.espaciados.mediano },
-  label: {
-    fontWeight: "700",
-    fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 6,
-    marginTop: tema.espaciados.mediano,
-    color: tema.colores.texto,
-  },
-  input: {
-    backgroundColor: tema.colores.fondoInput,
-    borderWidth: 1,
-    borderColor: tema.colores.borde,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: tema.radios.boton,
-    color: tema.colores.texto,
-    fontSize: 14,
-  },
-  multiline: { minHeight: 90, textAlignVertical: "top" },
-  posterRow: { flexDirection: "row", alignItems: "center", marginVertical: tema.espaciados.mediano, gap: tema.espaciados.mediano },
-  posterPreview: {
-    width: 100,
-    height: 150,
-    borderRadius: tema.radios.imagen,
-    backgroundColor: tema.colores.fondoInput,
-    borderWidth: 1,
-    borderColor: tema.colores.borde,
-  },
-  posterPlaceholder: { justifyContent: "center", alignItems: "center" },
-  posterButtons: { flex: 1 },
-  primaryButton: {
-    backgroundColor: tema.colores.botonPrimario,
-    paddingVertical: 14,
-    borderRadius: tema.radios.boton,
-    alignItems: "center",
-    marginTop: tema.espaciados.mediano,
-  },
-  buttonPrimaryText: { color: tema.colores.textoBotonPrimario, fontWeight: "700", fontSize: 14 },
-  secondaryButton: {
-    backgroundColor: tema.colores.botonSecundario,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: tema.radios.boton,
-    alignItems: "center",
-  },
-  buttonSecondaryText: { color: tema.colores.texto, fontWeight: "600", fontSize: 13 },
-});
+function crearEstilos(colores: typeof tema.colores) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colores.fondo },
+    formulario: { padding: tema.espaciados.mediano },
+    label: {
+      fontWeight: "700",
+      fontSize: 12,
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+      marginBottom: 6,
+      marginTop: tema.espaciados.mediano,
+      color: colores.texto,
+    },
+    input: {
+      backgroundColor: colores.fondoInput,
+      borderWidth: 1,
+      borderColor: colores.borde,
+      paddingVertical: 10,
+      paddingHorizontal: 18,
+      borderRadius: tema.radios.boton,
+      color: colores.texto,
+      fontSize: 14,
+    },
+    multiline: { minHeight: 90, textAlignVertical: "top" },
+    posterRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginVertical: tema.espaciados.mediano,
+      gap: tema.espaciados.mediano,
+    },
+    posterPreview: {
+      width: 100,
+      height: 150,
+      borderRadius: tema.radios.imagen,
+      backgroundColor: colores.fondoInput,
+      borderWidth: 1,
+      borderColor: colores.borde,
+    },
+    posterPlaceholder: { justifyContent: "center", alignItems: "center" },
+    posterButtons: { flex: 1 },
+    primaryButton: {
+      backgroundColor: colores.botonPrimario,
+      paddingVertical: 14,
+      borderRadius: tema.radios.boton,
+      alignItems: "center",
+      marginTop: tema.espaciados.mediano,
+    },
+    buttonPrimaryText: {
+      color: colores.textoBotonPrimario,
+      fontWeight: "700",
+      fontSize: 14,
+    },
+    secondaryButton: {
+      backgroundColor: colores.botonSecundario,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: tema.radios.boton,
+      alignItems: "center",
+    },
+    buttonSecondaryText: {
+      color: colores.texto,
+      fontWeight: "600",
+      fontSize: 13,
+    },
+  });
+}

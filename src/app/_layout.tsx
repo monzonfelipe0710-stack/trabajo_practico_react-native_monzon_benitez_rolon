@@ -1,7 +1,18 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { ProveedorTema, useTema } from "./tema";
 
 export default function LayoutRaiz() {
+  return (
+    <ProveedorTema>
+      <Navegacion />
+    </ProveedorTema>
+  );
+}
+
+function Navegacion() {
+  const { modo } = useTema();
+
   return (
     <>
       <Stack>
@@ -13,7 +24,7 @@ export default function LayoutRaiz() {
         <Stack.Screen name="agregar" options={{ title: "Agregar película" }} />
         <Stack.Screen name="acerca" options={{ title: "Acerca de" }} />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style={modo === "oscuro" ? "light" : "dark"} />
     </>
   );
 }
