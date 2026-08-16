@@ -129,6 +129,11 @@ const estilos = StyleSheet.create({
     gap: 12,
   },
   logo: { color: "#e50914", fontWeight: "800", fontSize: 18, marginRight: 12 },
+  searchRow: {
+    flexDirection: "row",
+    paddingHorizontal: 12,
+    paddingBottom: 10,
+  },
   search: {
     flex: 1,
     backgroundColor: "#111",
