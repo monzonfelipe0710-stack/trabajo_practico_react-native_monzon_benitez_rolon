@@ -30,24 +30,28 @@ Estado: [x] hecha - [ ] pendiente - [~] parcial
 - [x] Commit: "T04 - Agregue el menu de la aplicacion"
 
 ## T05 - Detalle de película
-- [ ] Pantalla src/app/detalle/[id].tsx usando obtenerPelicula(id)
-- [ ] Mostrar todos los campos de la película
+- [x] Pantalla src/app/detalle/[id].tsx usando obtenerPelicula(id)
+- [x] Mostrar todos los campos de la película
 
 ## T06 - Formulario para agregar película
-- [ ] Pantalla src/app/agregar.tsx usando agregarPelicula()
-- [ ] Validación de campos (título, género, año, descripción)
+- [x] Pantalla src/app/agregar.tsx usando agregarPelicula()
+- [x] Validación de campos (título, género, año, descripción)
 
 ## T07 - Pantalla Acerca de
-- [ ] Pantalla src/app/acerca.tsx con descripción de la app y autores
+- [x] Pantalla src/app/acerca.tsx con descripción de la app y autores
 
 ## T08 - Estados y navegación completa
 - [ ] Probar carga y estado vacío en el dispositivo
 - [ ] Probar navegación completa entre pantallas
 
-## T09 - Pruebas y correcciones
+## T09 - Persistencia local (AsyncStorage)
+- [x] Implementar persistencia con `@react-native-async-storage/async-storage`
+- [x] Guardar la lista tras agregar una película y cargarla al iniciar
+
+## T10 - Pruebas y correcciones
 - [ ] Revisión general del flujo
 - [ ] Corrección de errores encontrados
 
-## T10 - Documentación final
+## T11 - Documentación final
 - [~] Documentación inicial creada (spec, plan, tasks, proceso, readme)
 - [ ] Actualización final cuando estén todas las pantallas

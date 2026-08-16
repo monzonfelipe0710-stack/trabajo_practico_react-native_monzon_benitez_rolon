@@ -107,8 +107,111 @@ respaldo temporal (backup-fechas) que se eliminó al verificar el resultado.
 bajada debe hacer git fetch + git reset --hard origin/felipedev.
 
 ## Estado actual
-
+ 
 - Hechas: T01, T02, T03, T04 y documentación inicial (esta tarea).
-- Pendientes: T05 (detalle), T06 (formulario), T07 (acerca),
-  T08 (pruebas de estados y navegación), T09 (correcciones),
-  T10 (actualización final de esta documentación).
+- Hechas (reciente): T05, T06, T07 — implementadas pantallas detalle, agregar y acerca; navegación añadida.
+- Tareas añadidas/actualizadas:
+  - T08: pruebas de estados y navegación (pendiente de verificación en dispositivo). 
+  - T09: persistencia local con AsyncStorage (implementada).
+  - T10: actualización final de la documentación (en progreso — este archivo actualizado).
+
+## Sesión X - Persistencia con AsyncStorage
+
+**Qué se pidió:** agregar persistencia local para que las películas añadidas por el formulario sobrevivan al cerrar la app (opcional en la consigna, suma).
+
+**Qué se hizo:** se instaló y utilizó `@react-native-async-storage/async-storage` en `src/services/peliculas.ts`. El servicio ahora:
+
+- intenta cargar la lista guardada en la clave `peliculas_v1` al inicializar el módulo;
+- mantiene el mock por defecto si no hay datos guardados o si la carga falla;
+- guarda la lista completa en AsyncStorage cada vez que se agrega una película (operación no bloqueante para el caller).
+
+**Detalles técnicos:**
+
+- Archivo modificado: `src/services/peliculas.ts` — se importó `AsyncStorage`, se añadieron `cargarDesdeStorage()` y `guardarEnStorage()` y se invoca `guardarEnStorage()` tras `agregarPelicula()`.
+- Nueva dependencia agregada en `package.json`: `@react-native-async-storage/async-storage`.
+
+**Verificación:**
+
+1. Instalar dependencias: `npm install` o `yarn`.
+2. Ejecutar `npx tsc --noEmit` para comprobar tipos.
+3. Correr Expo (`npm run start`) y en Expo Go: agregar una película, cerrar la app y reabrir; la película debe seguir presente en el listado.
+
+**Errores/resguardos:**
+
+- Si AsyncStorage falla por permisos o plataforma, el servicio captura errores y usa el mock en memoria; se muestran `console.warn` en esos casos.
+
+## Prompts usados por tarea
+
+A continuación se registran los prompts enviados con `opencode` (CLI) para las tareas implementadas, y las correcciones manuales efectuadas tras revisar el código generado.
+
+### T05 - Detalle de película (`src/app/detalle/[id].tsx`)
+
+Prompt (envié desde la raíz del repo, rama `felipedev`):
+
+```
+Contexto: repo con spec.md y tasks.md. Tarea: T05 - Implementar la pantalla de detalle de película en src/app/detalle/[id].tsx.
+Requerimientos: usar la función obtenerPelicula(id) del servicio, manejar estados: carga (ActivityIndicator), vacío (mensaje) y detalle (título, género, año, descripción). Incluir un enlace para volver al listado. Mantener estilos coherentes con index.tsx y no añadir dependencias.
+Entregar: el archivo src/app/detalle/[id].tsx listo para compilar en Expo Router.
+```
+
+Correcciones manuales realizadas: reemplacé la importación de `useSearchParams` por `useLocalSearchParams` (compatibilidad con la versión de `expo-router`), ajusté estilos y añadí control de tipos para `id`.
+
+### T06 - Formulario para agregar película (`src/app/agregar.tsx`)
+
+Prompt:
+
+```
+Contexto: repo con spec.md y tasks.md. Tarea: T06 - Implementar formulario de alta en src/app/agregar.tsx.
+Requerimientos: inputs para título, género, año y descripción; validación básica (título, género y año obligatorios; año numérico razonable); llamar a agregarPelicula(datos) del servicio; mostrar ActivityIndicator durante el envío; al agregar correctamente, navegar a '/'. No usar librerías externas de validación.
+Entregar: src/app/agregar.tsx con manejo de estado y UX básico para Expo Go.
+```
+
+Correcciones manuales realizadas: afiné las reglas de validación (rechazar años <=1800), trim de strings antes de enviar y manejo de errores con Alert.
+
+### T07 - Pantalla Acerca (`src/app/acerca.tsx`)
+
+Prompt:
+
+```
+Contexto: repo con spec.md y tasks.md. Tarea: T07 - Crear una pantalla estática en src/app/acerca.tsx que describa la app y liste a los autores. Debe usar los estilos básicos del proyecto y ser mínima.
+Entregar: src/app/acerca.tsx listo.
+```
+
+Correcciones manuales realizadas: añadí un párrafo explicativo sobre decisiones técnicas y dejé un placeholder para los nombres de los integrantes.
+
+### T09 - Persistencia local (AsyncStorage) — cambio adicional
+
+Prompt:
+
+```
+Contexto: repo con spec.md y tasks.md. Tarea: Añadir persistencia opcional al mock de peliculas en src/services/peliculas.ts.
+Requerimientos: usar @react-native-async-storage/async-storage; al iniciar el módulo, intentar cargar la lista guardada desde la clave 'peliculas_v1'; al agregar una película, guardar la lista actualizada en AsyncStorage (operación asíncrona no bloqueante). Mantener la latencia simulada y el comportamiento en memoria si storage falla.
+Entregar: modificaciones en src/services/peliculas.ts y actualización de package.json.
+```
+
+Correcciones manuales realizadas: añadí manejo silencioso de errores (console.warn) y validé que guardar no bloquee el flujo de agregado; documenté la verificación manual en README.md.
+
+### T11 - Rellenar pósters desde TMDB para películas existentes
+
+Prompt:
+
+```
+Contexto: repo con spec.md y tasks.md. Tarea: T11 - Implementar en src/services/peliculas.ts una función que al inicializar intente buscar pósters en TMDB para las películas que no tengan `poster` y los guarde en AsyncStorage.
+Requerimientos: usar la clave TMDB proporcionada; realizar búsquedas secuenciales con un pequeño retardo entre peticiones para evitar ratas; no bloquear el arranque de la app (ejecutar en background); guardar resultados en storage cuando se obtenga un poster.
+Entregar: cambios en src/services/peliculas.ts y nota en README.md/PROCESO.md.
+```
+
+Correcciones manuales realizadas: agregué un retardo de 300ms entre peticiones y manejo silencioso de errores; documenté que la operación corre en background y que los posters persisten en AsyncStorage.
+
+### Notas sobre manejo de claves (TMDB)
+
+- Para evitar subir la API key al repositorio, movimos la clave a un archivo `.env` local (ver `.env.example`).
+- Añadimos `app.config.js` que carga `.env` vía `dotenv` y expone `TMDB_API_KEY` en `Constants.expoConfig.extra` para que la app pueda leerlo en tiempo de ejecución.
+- El código usa `src/config/tmdb.ts` que intenta leer `process.env.TMDB_API_KEY` y luego `Constants.expoConfig.extra.TMDB_API_KEY` como fallback.
+- Instrucciones: copiar `.env.example` a `.env`, colocar la clave y reiniciar Expo (`npm run start`).
+
+---
+
+Registrar estos prompts y sus correcciones en `PROCESO.md` ayuda a demostrar el flujo SDD: prompt → generación → revisión humana → commit por tarea.
+
+
