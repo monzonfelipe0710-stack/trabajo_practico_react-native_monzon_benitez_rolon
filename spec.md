@@ -33,9 +33,9 @@ type Pelicula = {
 | Ruta | Pantalla | Estado |
 |---|---|---|
 | `/` | Listado de películas | Implementada |
-| `/detalle/[id]` | Detalle de una película | Pendiente (ruta registrada) |
-| `/agregar` | Formulario para agregar película | Pendiente (ruta registrada) |
-| `/acerca` | Acerca de la aplicación | Pendiente (ruta registrada) |
+| `/detalle/[id]` | Detalle de una película | Implementada |
+| `/agregar` | Formulario para agregar película | Implementada |
+| `/acerca` | Acerca de la aplicación | Implementada |
 
 ## Requisitos funcionales
 
@@ -43,9 +43,10 @@ type Pelicula = {
 2. El listado muestra título, género y año de cada película.
 3. Mientras llegan los datos se muestra un estado de carga (ActivityIndicator).
 4. Si no hay películas, se muestra un mensaje de estado vacío.
-5. La pantalla de detalle muestra todos los datos de una película (`obtenerPelicula(id)`). [pendiente]
-6. El formulario permite agregar una película (`agregarPelicula()`) con validación de campos. [pendiente]
-7. La pantalla Acerca describe la aplicación y sus autores. [pendiente]
+5. La pantalla de detalle muestra todos los datos de una película (`obtenerPelicula(id)`).
+6. El formulario permite agregar una película (`agregarPelicula()`) con validación de campos.
+7. La pantalla Acerca describe la aplicación y sus autores.
+8. (Opcional) Persistencia local: las películas agregadas se guardan en `AsyncStorage` y se cargan al iniciar.
 
 ## Requisitos técnicos
 
@@ -59,5 +60,5 @@ type Pelicula = {
 ## Fuera de alcance
 
 - Backend, base de datos o autenticación reales.
-- Persistencia de datos entre sesiones (el mock vive en memoria).
+- Persistencia de datos entre sesiones: implementada con `AsyncStorage`.
 - Funcionalidades no pedidas en la consigna.

@@ -5,7 +5,7 @@ export default function LayoutRaiz() {
   return (
     <>
       <Stack>
-        <Stack.Screen name="index" options={{ title: "Películas" }} />
+        <Stack.Screen name="index" options={{ title: "TopFilms" }} />
         <Stack.Screen
           name="detalle/[id]"
           options={{ title: "Detalle de película" }}
