@@ -30,7 +30,13 @@ export default function Acerca() {
 function crearEstilos(colores: typeof tema.colores) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: colores.fondo },
-    content: { padding: tema.espaciados.mediano, width: "100%", maxWidth: 760, alignSelf: "center", paddingBottom: 40 },
+    content: {
+      padding: tema.espaciados.mediano,
+      width: "100%",
+      maxWidth: 760,
+      alignSelf: "center",
+      paddingBottom: 40,
+    },
     titulo: {
       fontSize: 26,
       fontWeight: "800",
