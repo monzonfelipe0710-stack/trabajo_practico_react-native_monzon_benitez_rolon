@@ -14,6 +14,7 @@ import {
 } from "react-native";
 
 import { obtenerPeliculas, type Pelicula } from "@/services/peliculas";
+import AnimatedReveal from "./components/AnimatedReveal";
 import Header from "./components/Header";
 import { tema, useTema } from "./tema";
 
@@ -62,28 +63,32 @@ export default function PantallaListado() {
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
           {destacada && (
-            <ImageBackground
-              source={destacada.poster ? { uri: destacada.poster } : undefined}
-              style={estilos.hero}
-              imageStyle={estilos.heroImage}
-            >
-              <View style={estilos.heroShade} />
-              <View style={estilos.heroContent}>
-                <Text style={estilos.kicker}>SELECCION DE HOY</Text>
-                <Text style={estilos.heroTitle}>{destacada.titulo}</Text>
-                <Text style={estilos.heroMeta}>
-                  {destacada.genero.toUpperCase()} / {destacada.anio}
-                </Text>
-                <TouchableOpacity
-                  style={estilos.heroButton}
-                  onPress={() => router.push(`/detalle/${destacada.id}`)}
-                >
-                  <Text style={estilos.heroButtonText}>VER DETALLE →</Text>
-                </TouchableOpacity>
-              </View>
-            </ImageBackground>
+            <AnimatedReveal>
+              <ImageBackground
+                source={
+                  destacada.poster ? { uri: destacada.poster } : undefined
+                }
+                style={estilos.hero}
+                imageStyle={estilos.heroImage}
+              >
+                <View style={estilos.heroShade} />
+                <View style={estilos.heroContent}>
+                  <Text style={estilos.kicker}>SELECCION DE HOY</Text>
+                  <Text style={estilos.heroTitle}>{destacada.titulo}</Text>
+                  <Text style={estilos.heroMeta}>
+                    {destacada.genero.toUpperCase()} / {destacada.anio}
+                  </Text>
+                  <TouchableOpacity
+                    style={estilos.heroButton}
+                    onPress={() => router.push(`/detalle/${destacada.id}`)}
+                  >
+                    <Text style={estilos.heroButtonText}>VER DETALLE →</Text>
+                  </TouchableOpacity>
+                </View>
+              </ImageBackground>
+            </AnimatedReveal>
           )}
-          <View style={estilos.content}>
+          <AnimatedReveal delay={120} style={estilos.content}>
             <View style={estilos.sectionHeading}>
               <View>
                 <Text style={estilos.eyebrow}>EXPLORA EL CATALOGO</Text>
@@ -163,7 +168,7 @@ export default function PantallaListado() {
                 SOBRE TOPFILMS →
               </Link>
             </View>
-          </View>
+          </AnimatedReveal>
         </ScrollView>
       )}
     </View>

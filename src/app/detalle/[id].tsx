@@ -1,23 +1,24 @@
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    useWindowDimensions,
+  ActivityIndicator,
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
 
 import {
-    completarDatosDesdeTMDB,
-    eliminarPelicula,
-    obtenerPelicula,
-    type Pelicula,
+  completarDatosDesdeTMDB,
+  eliminarPelicula,
+  obtenerPelicula,
+  type Pelicula,
 } from "@/services/peliculas";
+import AnimatedReveal from "../components/AnimatedReveal";
 import Header from "../components/Header";
 import { tema, useTema } from "../tema";
 
@@ -69,7 +70,7 @@ export default function DetallePelicula() {
     <View style={styles.container}>
       <Header />
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.cardRow}>
+        <AnimatedReveal style={styles.cardRow}>
           <View style={styles.imageContainer}>
             {pelicula.poster ? (
               <Image
@@ -112,7 +113,7 @@ export default function DetallePelicula() {
               <Text style={styles.textoEliminar}>ELIMINAR PELÍCULA</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </AnimatedReveal>
       </ScrollView>
     </View>
   );
@@ -146,7 +147,7 @@ function crearEstilos(colores: typeof tema.colores, ancho: number) {
       paddingHorizontal: tema.espaciados.chico,
       gap: tema.espaciados.mediano,
     },
-    details: { flex: 1 },
+    details: { flex: 1, width: esMovil ? "100%" : undefined, flexShrink: 1 },
     imageContainer: {
       width: esMovil ? "100%" : anchoPoster,
       alignItems: esMovil ? "center" : "stretch",
