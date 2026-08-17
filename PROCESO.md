@@ -13,6 +13,7 @@ explicable oralmente, commits en español por tarea, sin Conventional
 Commits, trabajar en la rama felipedev.
 
 **Qué se encontró:**
+
 - Proyecto con la plantilla por defecto de Expo (tabs): app/(tabs)/,
   modal.tsx, componentes de ejemplo.
 - Expo SDK 54, expo-router 6, TypeScript estricto, sin dependencias extra
@@ -57,17 +58,19 @@ estado de carga, estado vacío y FlatList mostrando título, género y año;
 y preparar el menú/navegación con las rutas inicio, detalle, agregar y
 acerca, sin implementar las pantallas de los demás integrantes. No tocar
 el mock. Se consultó al equipo y se aprobó mover app/ a src/app/, borrar
-la plantilla sin uso y ajustar el alias @/* a ./src/*.
+la plantilla sin uso y ajustar el alias @/_ a ./src/_.
 
 **Qué se generó:**
+
 - src/app/index.tsx: listado con useEffect + obtenerPeliculas(),
   ActivityIndicator durante la carga, mensaje si no hay películas y
   FlatList con tarjetas.
-- src/app/_layout.tsx: Stack con las cuatro rutas registradas.
+- src/app/\_layout.tsx: Stack con las cuatro rutas registradas.
 - Menú con Link hacia /agregar y /acerca en el inicio.
 - tsconfig.json con alias actualizado; app.json con typedRoutes desactivada.
 
 **Errores que aparecieron y cómo se resolvieron:**
+
 1. git rm de la plantilla falló porque los archivos acababan de moverse con
    git mv; se resolvió con git rm -r -f.
 2. El archivo .expo/types/router.d.ts (generado por typedRoutes) seguía
@@ -107,11 +110,11 @@ respaldo temporal (backup-fechas) que se eliminó al verificar el resultado.
 bajada debe hacer git fetch + git reset --hard origin/felipedev.
 
 ## Estado actual
- 
+
 - Hechas: T01, T02, T03, T04 y documentación inicial (esta tarea).
 - Hechas (reciente): T05, T06, T07 — implementadas pantallas detalle, agregar y acerca; navegación añadida.
 - Tareas añadidas/actualizadas:
-  - T08: pruebas de estados y navegación (pendiente de verificación en dispositivo). 
+  - T08: pruebas de estados y navegación (pendiente de verificación en dispositivo).
   - T09: persistencia local con AsyncStorage (implementada).
   - T10: actualización final de la documentación (en progreso — este archivo actualizado).
 
@@ -214,4 +217,112 @@ Correcciones manuales realizadas: agregué un retardo de 300ms entre peticiones 
 
 Registrar estos prompts y sus correcciones en `PROCESO.md` ayuda a demostrar el flujo SDD: prompt → generación → revisión humana → commit por tarea.
 
+## Sesión 12 - Rediseño visual del catálogo
 
+**Qué se pidió:** adaptar la aplicación para que tenga una estética similar a
+On Point Samples, tomando como referencia su portada de catálogo: hero visual,
+navegación oscura, tarjetas de contenido, secciones editoriales y acento de
+color fuerte.
+
+**Qué se hizo:**
+
+- Se actualizó `src/app/tema.ts` con una paleta marfil, carbón y coral,
+  nuevos radios y colores para superficies, texto y botones.
+- Se rediseñó `src/app/components/Header.tsx` con marca TopFilms, subtítulo,
+  navegación de catálogo y botón de tema.
+- Se reorganizó `src/app/index.tsx` con hero destacado, buscador, filtros por
+  género, carrusel de películas y enlaces de navegación.
+- Se mantuvo la lógica existente del catálogo y las rutas de Expo Router.
+
+**Correcciones manuales:** se conservaron las APIs del servicio y se evitó
+copiar HTML o código de la página de referencia; solo se trasladaron ideas
+visuales al contexto React Native.
+
+**Commit:** `aaa2384 Mejore la estetica con un tema claro estilo tienda`.
+
+## Sesión 13 - Tema claro y oscuro
+
+**Qué se pidió:** incorporar modo claro y modo oscuro, dejando el modo claro
+como opción predeterminada.
+
+**Qué se hizo:**
+
+- Se agregó `ProveedorTema` y `useTema` en `src/app/tema.ts`.
+- El modo seleccionado se guarda en AsyncStorage con la clave
+  `topfilms_modo_tema`.
+- `src/app/_layout.tsx` aplica el proveedor a toda la navegación y cambia el
+  estilo de la barra de estado.
+- `Header.tsx`, `index.tsx`, `detalle/[id].tsx`, `agregar.tsx` y `acerca.tsx`
+  consumen la paleta activa.
+
+**Verificación:** `npx tsc --noEmit` sin errores. Se comprobó el cambio desde
+el header y la persistencia al reiniciar la app.
+
+**Commit:** `2f588be Agregue modo claro, modo oscuro y eliminación de películas`.
+
+## Sesión 14 - Eliminación de películas
+
+**Qué se pidió:** agregar la función fundamental para eliminar películas.
+
+**Qué se hizo:**
+
+- Se agregó `eliminarPelicula(id)` en `src/services/peliculas.ts`.
+- La función actualiza la lista en memoria y persiste el resultado en
+  AsyncStorage.
+- La pantalla `src/app/detalle/[id].tsx` muestra un botón de eliminación con
+  confirmación mediante `Alert` y vuelve al catálogo después de eliminar.
+
+**Verificación:** TypeScript sin errores y revisión manual del flujo de
+confirmar/cancelar eliminación.
+
+## Sesión 15 - Adaptación responsive
+
+**Qué se pidió:** adaptar la aplicación para PC, tablet y cualquier dispositivo
+móvil.
+
+**Qué se hizo:**
+
+- `index.tsx` usa `useWindowDimensions` para ajustar hero, tipografías,
+  tarjetas, espacios y ancho máximo del contenido.
+- `detalle/[id].tsx` usa dos columnas en escritorio y apila póster e
+  información en móviles; el bloque de información ocupa todo el ancho móvil
+  para evitar texto comprimido.
+- `agregar.tsx` incorpora scroll, `keyboardShouldPersistTaps` y un ancho
+  máximo para escritorio.
+- `acerca.tsx` incorpora scroll y limita el ancho de lectura.
+
+**Problema encontrado:** en móvil el detalle heredaba `flex: 1` dentro de una
+columna y el texto quedaba en una columna de letras. Se corrigió usando
+`width: "100%"` y `flexShrink: 1` en el bloque de información móvil.
+
+**Commit:** `af28cca Adapte las pantallas para PC y móviles`.
+
+## Sesión 16 - Animaciones y corrección final del detalle móvil
+
+**Qué se pidió:** corregir la vista móvil mostrada en la captura y agregar
+animaciones para que la aplicación no se sintiera brusca.
+
+**Qué se hizo:**
+
+- Se creó `src/app/components/AnimatedReveal.tsx`, un componente reutilizable
+  de entrada con opacidad y desplazamiento vertical.
+- Se usa `useNativeDriver` para mantener la animación fluida.
+- Se consulta `AccessibilityInfo.isReduceMotionEnabled()` y se reduce la
+  animación cuando el sistema lo solicita.
+- Se animan el hero y el contenido del catálogo, además de la ficha de detalle.
+- Se corrigió definitivamente el layout móvil del detalle apilando el
+  contenido y evitando que el texto se comprima.
+
+**Verificación:** `npx tsc --noEmit` sin errores; `npm run lint` sin errores.
+El lint mantiene siete warnings preexistentes relacionados con imports y
+variables sin uso en `agregar.tsx` y `peliculas.ts`.
+
+**Commit:** `c2178a9 Agregue animaciones y mejore el detalle en móviles`.
+
+## Estado final de documentación
+
+- Rama de trabajo: `felipedev`.
+- Se verificó TypeScript antes de los commits visuales y responsive.
+- No se hizo push automático.
+- La fusión final a `main` se realiza después de documentar y validar este
+  conjunto de cambios.
