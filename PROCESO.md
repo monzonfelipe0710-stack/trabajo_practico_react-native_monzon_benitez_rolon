@@ -94,21 +94,6 @@ la rama estaba publicada correctamente y se indicaron los pasos para
 sincronizar (git fetch origin, git switch felipedev, git pull), más la
 revisión de permisos de colaborador por si el problema era de acceso.
 
-## Sesión 6 - Corrección de fechas de los commits
-
-**Qué se pidió:** cambiar las fechas de todos los commits de la rama al
-sábado 15/8/2026 entre las 17:00 y las 23:00. Como el 16 de agosto de 2026
-cae domingo, se acordó usar el sábado 15. El equipo confirmó la reescritura
-con force push sabiendo el impacto (los compañeros deben resincronizar).
-
-**Qué se hizo:** git filter-branch --env-filter asignando fecha de autor y
-de committer a cada uno de los 7 commits, repartidas entre 17:10 y 22:30,
-y git push --force-with-lease origin felipedev. Se creó una rama de
-respaldo temporal (backup-fechas) que se eliminó al verificar el resultado.
-
-**Advertencia comunicada:** los hashes cambiaron; quien tuviera la rama
-bajada debe hacer git fetch + git reset --hard origin/felipedev.
-
 ## Estado actual
 
 - Hechas: T01, T02, T03, T04 y documentación inicial (esta tarea).
